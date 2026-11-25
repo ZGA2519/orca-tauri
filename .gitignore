@@ -163,3 +163,7 @@ ci-shards/
 /.build/windows-native-benchmark/
 
 .local/static-analysis-research/
+
+# Tauri shell build output
+src-tauri/target/
+src-tauri/gen/
