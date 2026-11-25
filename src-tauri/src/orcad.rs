@@ -48,6 +48,7 @@ pub fn spawn(
         .spawn()?;
     let stdout = child.stdout.take().ok_or("orcad stdout unavailable")?;
 
+    let app = app.clone();
     std::thread::spawn(move || {
         let mut navigated = false;
         // Keep draining after readiness so orcad never blocks on a full stdout pipe.
@@ -56,7 +57,7 @@ pub fn spawn(
                 continue;
             }
             if let Some(url) = web_client_url(&line) {
-                navigated = window.navigate(url).is_ok();
+                navigated = grant_native_access(&app, &url).is_ok() && window.navigate(url).is_ok();
             }
         }
         if !navigated {
@@ -113,6 +114,33 @@ fn find_node(runtimes: &Path) -> Option<PathBuf> {
             ]
         })
         .find(|candidate| candidate.is_file())
+}
+
+/// Tauri IPC for this run's orcad origin only; the port changes every launch, so it can't be static config.
+fn grant_native_access(app: &AppHandle, url: &Url) -> tauri::Result<()> {
+    let origin = format!(
+        "{}://{}:{}/*",
+        url.scheme(),
+        url.host_str().unwrap_or_default(),
+        url.port_or_known_default().unwrap_or_default()
+    );
+    let capability = serde_json::json!({
+        "identifier": "orcad-web-client",
+        "windows": ["main"],
+        "remote": { "urls": [origin] },
+        "permissions": [
+            "core:event:default",
+            "core:window:default",
+            "core:window:allow-minimize",
+            "core:window:allow-toggle-maximize",
+            "core:webview:allow-set-webview-zoom",
+            "dialog:allow-open",
+            "opener:allow-open-url",
+            "opener:allow-reveal-item-in-dir",
+            { "identifier": "opener:allow-open-path", "allow": [{ "path": "**" }] }
+        ]
+    });
+    app.add_capability(capability.to_string())
 }
 
 fn web_client_url(line: &str) -> Option<Url> {

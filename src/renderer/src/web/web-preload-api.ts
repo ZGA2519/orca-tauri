@@ -1,6 +1,8 @@
 import type { PreloadApi } from '../../../preload/api-types'
 import type { StatsSummary } from '../../../shared/diagnostics/process-stats-types'
 import { createWebE2EApi } from './preload-api/app/web-e2e-api'
+import { isTauriHost } from '@/app-shell/platform/web-client-location'
+import { withTauriNativeApis } from './preload-api/tauri/tauri-native-apis'
 import {
   createClaudeAccountsApi,
   createCodexAccountsApi,
@@ -68,11 +70,18 @@ export function installWebPreloadApi(): void {
   window.api = withFallback(createWebPreloadApi(), []) as PreloadApi
 }
 
-function createWebPreloadApi(): Omit<Partial<PreloadApi>, 'settings' | 'plugins' | 'speech'> & {
+type WebPreloadApi = Omit<Partial<PreloadApi>, 'settings' | 'plugins' | 'speech'> & {
   settings: Partial<PreloadApi['settings']>
   plugins: Partial<PreloadApi['plugins']>
   speech: Partial<PreloadApi['speech']>
-} {
+}
+
+function createWebPreloadApi(): WebPreloadApi {
+  const api = createRuntimeBackedApi()
+  return isTauriHost() ? withTauriNativeApis(api) : api
+}
+
+function createRuntimeBackedApi(): WebPreloadApi {
   return {
     ...createWebAppApi(),
     ...createWebStarNagApi(),
