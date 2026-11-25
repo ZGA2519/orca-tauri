@@ -135,6 +135,7 @@ fn grant_native_access(app: &AppHandle, url: &Url) -> tauri::Result<()> {
             "core:window:allow-toggle-maximize",
             "core:webview:allow-set-webview-zoom",
             "dialog:allow-open",
+            "notification:default",
             "opener:allow-open-url",
             "opener:allow-reveal-item-in-dir",
             { "identifier": "opener:allow-open-path", "allow": [{ "path": "**" }] }

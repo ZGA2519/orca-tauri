@@ -1,4 +1,13 @@
+import type { NotificationDispatchRequest } from './notification-settings-types'
+
 export const NOTIFICATION_COOLDOWN_MS = 5000
+
+// Keyed news is announced once by its producer, so only its own repeat may collapse it.
+export const notificationDedupeKey = (request: NotificationDispatchRequest): string =>
+  JSON.stringify([
+    request.executionHost,
+    request.attentionKey ?? request.worktreeId ?? request.worktreeLabel ?? 'global'
+  ])
 const MAX_RECENT_NOTIFICATION_KEYS = 50
 
 function pruneRecentNotifications(recentNotifications: Map<string, number>, now: number): void {

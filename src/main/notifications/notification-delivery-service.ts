@@ -9,9 +9,12 @@ import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import {
   buildNotificationOptions,
   notificationNeedsSlackReplyCheck
-} from '../ipc/notifications/notification-options'
+} from '../../shared/notifications/notification-options'
 import { translateMain } from '../i18n/main-i18n'
-import { reserveNotificationCooldown } from '../../shared/notifications/notification-burst-cooldown'
+import {
+  notificationDedupeKey as dedupeKeyFor,
+  reserveNotificationCooldown
+} from '../../shared/notifications/notification-burst-cooldown'
 import { toHostSessionPaneKey } from '../../shared/workspace-layout/terminal-surface-id'
 import { isNotificationSourceEnabled } from '../../shared/notifications/notification-source-gate'
 import { notificationDeliveryId } from '../../shared/notifications/notification-delivery-id'
@@ -60,13 +63,6 @@ export function createNotificationDeliveryService(
 ): NotificationDeliveryService {
   const recentDesktopNotifications = new Map<string, number>()
   const recentMobileNotifications = new Map<string, number>()
-
-  // Keyed news is announced once by its producer, so only its own repeat may collapse it.
-  const dedupeKeyFor = (request: NotificationDispatchRequest): string =>
-    JSON.stringify([
-      request.executionHost,
-      request.attentionKey ?? request.worktreeId ?? request.worktreeLabel ?? 'global'
-    ])
 
   const deliverNativeAndRecord = (
     request: NotificationDispatchRequest,

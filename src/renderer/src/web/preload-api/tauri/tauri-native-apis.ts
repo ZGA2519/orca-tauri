@@ -5,8 +5,13 @@ import { openPath, openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import type { PreloadApi } from '../../../../../preload/api-types'
 import type { ExecutionHostId } from '../../../../../shared/execution-host/execution-host'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../../../shared/execution-host/execution-host'
+import { createTauriNotificationsApi } from './tauri-notifications-api'
 
-type NativeOverridableApi = Partial<Pick<PreloadApi, 'ui' | 'shell' | 'repos'>>
+type NativeOverridableApi = Partial<
+  Pick<PreloadApi, 'ui' | 'shell' | 'repos' | 'notifications'>
+> & {
+  settings?: Partial<Pick<PreloadApi['settings'], 'get'>>
+}
 
 // orcad runs on this machine, so its 'local' host paths are paths the shell can open.
 const isShellLocal = (hostId: ExecutionHostId): boolean => hostId === LOCAL_EXECUTION_HOST_ID
@@ -35,8 +40,9 @@ function onMaximizeChanged(callback: (isMaximized: boolean) => void): () => void
 
 /** Swaps the web client's no-op window, shell and picker stubs for the Tauri shell's native ones. */
 export function withTauriNativeApis<T extends NativeOverridableApi>(api: T): T {
-  const { ui, shell, repos } = api
-  if (!ui || !shell || !repos) {
+  const { ui, shell, repos, notifications } = api
+  const readSettings = api.settings?.get
+  if (!ui || !shell || !repos || !notifications || !readSettings) {
     return api
   }
   const appWindow = getCurrentWindow()
@@ -76,6 +82,7 @@ export function withTauriNativeApis<T extends NativeOverridableApi>(api: T): T {
       },
       pickDirectory: (args) => pickDirectory(args?.defaultPath)
     },
-    repos: { ...repos, pickDirectory: () => pickDirectory() }
+    repos: { ...repos, pickDirectory: () => pickDirectory() },
+    notifications: createTauriNotificationsApi(notifications, readSettings)
   }
 }
