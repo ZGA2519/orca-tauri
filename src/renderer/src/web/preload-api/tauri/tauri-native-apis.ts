@@ -1,3 +1,4 @@
+import { invoke } from '@tauri-apps/api/core'
 import { getCurrentWebview } from '@tauri-apps/api/webview'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -5,10 +6,11 @@ import { openPath, openUrl, revealItemInDir } from '@tauri-apps/plugin-opener'
 import type { PreloadApi } from '../../../../../preload/api-types'
 import type { ExecutionHostId } from '../../../../../shared/execution-host/execution-host'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../../../shared/execution-host/execution-host'
+import { TRASH_DELETE_FAILED_MESSAGE } from '../../../../../shared/file-access/trash-delete-failure'
 import { createTauriNotificationsApi } from './tauri-notifications-api'
 
 type NativeOverridableApi = Partial<
-  Pick<PreloadApi, 'ui' | 'shell' | 'repos' | 'notifications'>
+  Pick<PreloadApi, 'ui' | 'shell' | 'repos' | 'notifications' | 'fs'>
 > & {
   settings?: Partial<Pick<PreloadApi['settings'], 'get'>>
 }
@@ -40,9 +42,9 @@ function onMaximizeChanged(callback: (isMaximized: boolean) => void): () => void
 
 /** Swaps the web client's no-op window, shell and picker stubs for the Tauri shell's native ones. */
 export function withTauriNativeApis<T extends NativeOverridableApi>(api: T): T {
-  const { ui, shell, repos, notifications } = api
+  const { ui, shell, repos, notifications, fs } = api
   const readSettings = api.settings?.get
-  if (!ui || !shell || !repos || !notifications || !readSettings) {
+  if (!ui || !shell || !repos || !notifications || !fs || !readSettings) {
     return api
   }
   const appWindow = getCurrentWindow()
@@ -83,6 +85,21 @@ export function withTauriNativeApis<T extends NativeOverridableApi>(api: T): T {
       pickDirectory: (args) => pickDirectory(args?.defaultPath)
     },
     repos: { ...repos, pickDirectory: () => pickDirectory() },
-    notifications: createTauriNotificationsApi(notifications, readSettings)
+    notifications: createTauriNotificationsApi(notifications, readSettings),
+    fs: {
+      ...fs,
+      // orcad can only delete permanently; local deletes go to the Trash like Electron's.
+      deletePath: async (args) => {
+        if (args.permanent || args.connectionId) {
+          return fs.deletePath(args)
+        }
+        try {
+          await invoke('move_to_trash', { path: args.targetPath })
+        } catch (error) {
+          // The file explorer offers a permanent retry only for this message.
+          throw new Error(`${TRASH_DELETE_FAILED_MESSAGE}: ${String(error)}`)
+        }
+      }
+    }
   }
 }

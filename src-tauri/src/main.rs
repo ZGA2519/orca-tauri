@@ -1,6 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod orcad;
+mod trash;
 
 use tauri::{Manager, RunEvent};
 
@@ -9,6 +10,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
+        .invoke_handler(tauri::generate_handler![trash::move_to_trash])
         .setup(|app| {
             let window = app
                 .get_webview_window("main")
