@@ -29,7 +29,11 @@ pub fn spawn(
     let profile = app.path().app_data_dir()?.join("profile");
     std::fs::create_dir_all(&profile)?;
 
-    let mut child = Command::new(node)
+    let mut command = Command::new(node);
+    // A GUI-subsystem parent would otherwise flash a console window for node.exe.
+    #[cfg(windows)]
+    std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0800_0000); // CREATE_NO_WINDOW
+    let mut child = command
         .args(["--import", EXIT_WHEN_SHELL_EXITS])
         .arg(base.join("orcad").join("orcad.js"))
         .args([
