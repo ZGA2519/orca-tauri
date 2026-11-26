@@ -100,7 +100,7 @@ impl Sidecar {
 /// Dev runs from the repo's build output; bundles ship the same tree as resources.
 fn artifacts_root(app: &AppHandle) -> Result<PathBuf, Box<dyn std::error::Error>> {
     if cfg!(debug_assertions) {
-        return Ok(Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("out"));
+        return Ok(Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("..").join("out"));
     }
     Ok(app.path().resource_dir()?)
 }

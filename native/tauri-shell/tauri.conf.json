@@ -26,14 +26,14 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "../resources/build/icon.png",
-      "../resources/build/icon.icns",
-      "../resources/build/icon.ico"
+      "../../resources/build/icon.png",
+      "../../resources/build/icon.icns",
+      "../../resources/build/icon.ico"
     ],
     "resources": {
-      "../out/orcad/": "orcad/",
-      "../out/runtimes/": "runtimes/",
-      "../out/web/": "web/"
+      "../../out/orcad/": "orcad/",
+      "../../out/runtimes/": "runtimes/",
+      "../../out/web/": "web/"
     }
   }
 }
