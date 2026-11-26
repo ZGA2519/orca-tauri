@@ -1,3 +1,8 @@
+/** The web client hosted by the Tauri shell, which grants it native window, dialog and opener access. */
+export function isTauriHost(): boolean {
+  return typeof window !== 'undefined' && '__TAURI_INTERNALS__' in window
+}
+
 export function isWebClientLocation(): boolean {
   if (typeof window === 'undefined') {
     return false

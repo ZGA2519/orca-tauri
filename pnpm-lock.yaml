@@ -220,6 +220,18 @@ importers:
       '@parcel/watcher':
         specifier: ^2.5.6
         version: 2.5.6
+      '@tauri-apps/api':
+        specifier: ^2.12.5
+        version: 2.12.5
+      '@tauri-apps/plugin-dialog':
+        specifier: ^2.8.4
+        version: 2.8.4
+      '@tauri-apps/plugin-notification':
+        specifier: ^2.8.1
+        version: 2.8.1
+      '@tauri-apps/plugin-opener':
+        specifier: ^2.7.3
+        version: 2.7.3
       '@xterm/addon-serialize':
         specifier: 0.15.0-beta.330
         version: 0.15.0-beta.330(patch_hash=17ca66ab9c7f52fc2fee94053b3b587c1210da468f3ddc7c4f5dba50b521c93e)(@xterm/xterm@6.1.0-beta.336(patch_hash=c5421560f0f6faaa1dd5dba59d50819b16ea1446a7f3f34a839a53becf8e380d))
@@ -3762,6 +3774,18 @@ packages:
 
   '@tanstack/virtual-core@3.17.11':
     resolution: {integrity: sha512-+ILjvtHup6Y2hzQ6YzwMgX1Q+oQpxEGOXCEsCNaPoIP0VxMbizIBTmYTDtkerkIQS8/CbP1BRuyt8V/8BCsy1g==}
+
+  '@tauri-apps/api@2.12.5':
+    resolution: {integrity: sha512-G9QIMt5fzED+aS4QhVK3w1HWLKpLIwH/MnpCr9z1ugGEHnS2ORmqrLkc0uALOjRK4qXJy+4Yiw8LDl/KicC1Hg==}
+
+  '@tauri-apps/plugin-dialog@2.8.4':
+    resolution: {integrity: sha512-+6ZOiXenOaxXwb8qCbBPdT2jX2cFPaVVHGIskrpmJLpmWj+qKRTD6X/z9x7hTdSQn7NedcoXCkWGej4a7dC4lw==}
+
+  '@tauri-apps/plugin-notification@2.8.1':
+    resolution: {integrity: sha512-B+OCJv17XCFQxAhe2+fn2bHqQ1fz/hGnYHeT++yv8+q0daOH5o1ghX7MmxWgoGFp7POaNn4UMONclHeZn65mJA==}
+
+  '@tauri-apps/plugin-opener@2.7.3':
+    resolution: {integrity: sha512-Nm+v7vLBCDzYZxrmCJhpMgtPsPsKt5myMs7SMU/aBjPOmAFI1RrHfhMz7t5KlxjMOzRcelyNq1/j0pmC9SmBVA==}
 
   '@testing-library/dom@10.4.1':
     resolution: {integrity: sha512-o4PXJQidqJl82ckFaXUeoAW+XysPLauYI43Abki5hABd853iMhitooc6znOnczgbTYmEP6U6/y1ZyKAIsvMKGg==}
@@ -10898,6 +10922,20 @@ snapshots:
       '@types/react-dom': 19.2.7(@types/react@19.2.18)
 
   '@tanstack/virtual-core@3.17.11': {}
+
+  '@tauri-apps/api@2.12.5': {}
+
+  '@tauri-apps/plugin-dialog@2.8.4':
+    dependencies:
+      '@tauri-apps/api': 2.12.5
+
+  '@tauri-apps/plugin-notification@2.8.1':
+    dependencies:
+      '@tauri-apps/api': 2.12.5
+
+  '@tauri-apps/plugin-opener@2.7.3':
+    dependencies:
+      '@tauri-apps/api': 2.12.5
 
   '@testing-library/dom@10.4.1':
     dependencies:

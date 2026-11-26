@@ -1,0 +1,68 @@
+name: Tauri shell
+
+# Not a required check: the Tauri shell ships beside Electron and must never gate an Electron release.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'native/tauri-shell/**'
+      - 'src/renderer/src/web/preload-api/tauri/**'
+      - 'src/renderer/src/web/web-preload-api.ts'
+      - 'src/main/orcad/**'
+      - '.github/workflows/tauri-shell.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tauri-shell-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  boot-smoke:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft != true
+    runs-on: macos-15
+    timeout-minutes: 40
+    env:
+      ORCA_BACKGROUND_LAUNCH: '1'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/install-node-dependencies
+      - name: Install Rust
+        run: |
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+      # The shell never serves the phone client; a valid placeholder satisfies the orcad build.
+      - run: node config/scripts/build/mobile-web-app/write-placeholder-mobile-web-bundle.mjs
+      - run: pnpm build:web
+      - run: pnpm build:orcad
+      - name: Rust tests
+        working-directory: native/tauri-shell
+        run: cargo test --locked
+      # Boots the hidden shell, waits for the webview to pair with orcad, then checks orcad exits with it.
+      - name: Boot smoke
+        working-directory: native/tauri-shell
+        run: |
+          cargo build --locked
+          ./target/debug/orca-tauri > shell.log 2>&1 &
+          shell_pid=$!
+          for _ in $(seq 1 120); do
+            grep -q 'client connected' shell.log && break
+            sleep 1
+          done
+          kill -KILL "$shell_pid"
+          paired=0
+          grep -q 'client connected' shell.log && paired=1
+          for _ in $(seq 1 15); do
+            pgrep -f 'out/orcad/orcad.js' > /dev/null || break
+            sleep 1
+          done
+          # The log carries pairing tokens; print only lines without them.
+          if [ "$paired" != 1 ] || pgrep -f 'out/orcad/orcad.js' > /dev/null; then
+            grep -vE 'pair|token|code=' shell.log | tail -60
+            echo "paired=$paired, orcad still running: $(pgrep -f 'out/orcad/orcad.js' || echo no)"
+            exit 1
+          fi

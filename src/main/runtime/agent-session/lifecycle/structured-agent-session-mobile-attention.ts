@@ -30,7 +30,7 @@ import type { BotGroup } from '../../../../shared/bots/bot-group'
 import {
   buildNotificationOptions,
   notificationNeedsSlackReplyCheck
-} from '../../../ipc/notifications/notification-options'
+} from '../../../../shared/notifications/notification-options'
 import type { MobileNotificationDispatchEvent } from '../../push/notifications/runtime-mobile-notification-controller'
 import type { RuntimeStore } from '../../construction/runtime-store-contract'
 import { getRuntimeDesktopSurface } from '../../construction/runtime-desktop-surface'

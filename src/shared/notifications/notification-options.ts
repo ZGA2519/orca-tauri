@@ -1,12 +1,9 @@
-import { readWholeAgentSessionFailureFact } from '../../../shared/agent-session/failures/agent-session-failure'
-import { agentSessionFailureWords } from '../../../shared/agent-session/failures/agent-session-failure-words'
-import { formatUsageLimitResetClock } from '../../../shared/agent-session/failures/agent-session-usage-limit'
-import { formatAgentTypeLabel } from '../../../shared/agent-status/presentation/agent-type-label'
-import type { NotificationDispatchRequest } from '../../../shared/notifications/notification-settings-types'
-import {
-  hasSlackMentionMarkup,
-  slackMentionsPlainText
-} from '../../../shared/connectors/slack-message-markup'
+import { readWholeAgentSessionFailureFact } from '../agent-session/failures/agent-session-failure'
+import { agentSessionFailureWords } from '../agent-session/failures/agent-session-failure-words'
+import { formatUsageLimitResetClock } from '../agent-session/failures/agent-session-usage-limit'
+import { formatAgentTypeLabel } from '../agent-status/presentation/agent-type-label'
+import type { NotificationDispatchRequest } from './notification-settings-types'
+import { hasSlackMentionMarkup, slackMentionsPlainText } from '../connectors/slack-message-markup'
 
 type NotificationTranslator = (key: string, fallback: string) => string
 

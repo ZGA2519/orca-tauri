@@ -3451,6 +3451,32 @@
     "unhide": "Show All",
     "zoom": "Zoom"
   },
+  "notifications": {
+    "agentStatus": {
+      "failed": "failed",
+      "finished": "finished",
+      "needsInput": "needs input",
+      "stopped": "stopped",
+      "working": "working"
+    },
+    "agentTool": {
+      "input": "Tool input: {{input}}",
+      "using": "Using {{tool}}",
+      "usingWithInput": "Using {{tool}}: {{input}}"
+    },
+    "bell": {
+      "attentionRequested": "Attention requested",
+      "title": "Bell in {{worktree}}"
+    },
+    "taskComplete": {
+      "body": "A coding agent finished working.",
+      "title": "Task complete in {{worktree}}"
+    },
+    "test": {
+      "body": "This is a test notification from Orca."
+    },
+    "workspaceFallback": "workspace"
+  },
   "perfNotices": {
     "hiddenTabs": {
       "descriptionOneHour_one": "You have {{count}} tab you haven't viewed in over an hour. Turn on Memory Saver to free up its memory.",
